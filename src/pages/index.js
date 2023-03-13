@@ -1,17 +1,61 @@
 import Head from "next/head";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import { getProviders, signIn, signOut, useSession } from "next-auth/react";
+import { Button, Cascader } from "antd";
+import axios from "axios";
+import Listbox from "@/components/ListBox";
+import Details from "@/components/Details";
 
 const inter = Inter({ subsets: ["latin"] });
+const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 
 export default function Home({ providers }) {
   const { data: session, status } = useSession();
+  const [token, setToken] = useState("");
+  const [playlist, setPlaylist] = useState([]);
+  const [tracks, setTracks] = useState([]);
+  const [trackDetail, setTrackDetail] = useState(null);
+
+  useEffect(() => {
+    if (session?.user?.accessToken) {
+      setToken(session.user.accessToken);
+    }
+  }, [session]);
 
   if (status === "loading") {
     return <div>Loading...</div>;
   }
+
+  const handleGetPlaylists = () => {
+    axios
+      .get(PLAYLIST_ENDPOINT, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((playlistResponse) => {
+        console.log("playlistResponse", playlistResponse);
+        setPlaylist(playlistResponse.data.items);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const listboxClicked = (val) => {
+    console.log("listboxclicked", val);
+    axios(`https://api.spotify.com/v1/playlists/${val}/tracks`, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }).then((tracksResponse) => {
+      setTracks(tracksResponse.data.items);
+      console.log("settrack", tracksResponse);
+    });
+  };
 
   return (
     <>
@@ -21,16 +65,12 @@ export default function Home({ providers }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {session?.user?.accessToken && (
+      {/* {session?.user?.accessToken && (
         <div style={{ display: "flex", flexDirection: "column" }}>
           Access Token: {session.user.accessToken}
-          <br />
-          <br />
-          <Link href="/select-playlist">Learn about your music taste</Link>
-          <Link href="/select-friends">Compare with your friends</Link>
         </div>
-      )}
-      <main className={styles.main}>
+      )} */}
+      <header className={styles.header}>
         {Object.values(providers).map((provider) => {
           return status === "unauthenticated" ? (
             <button key={provider.name} onClick={() => signIn()}>
@@ -42,6 +82,29 @@ export default function Home({ providers }) {
             </button>
           );
         })}
+      </header>
+      <main className={styles.main}>
+        <Button
+          onClick={handleGetPlaylists}
+          type="primary"
+          style={{ background: "#1DB954", margin: "20px" }}
+          // href="/select-playlist"
+        >
+          Learn about your music taste
+        </Button>
+
+        <Listbox label="Playlist :" items={playlist} clicked={listboxClicked} />
+        {tracks.map((item, idx) => (
+          <Details option={item.track} key={idx} />
+        ))}
+
+        {/* <Button
+          type="primary"
+          style={{ background: "#1DB954" }}
+          href="/select-friends"
+        >
+          Compare with your friends
+        </Button> */}
       </main>
     </>
   );
