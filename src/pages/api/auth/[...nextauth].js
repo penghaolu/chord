@@ -6,7 +6,8 @@ export const authOptions = {
     SpotifyProvider({
       clientId: process.env.SPOTIFY_API_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_API_CLIENT_SECRET,
-      scope: "user-top-read",
+      scope:
+        "user-top-read user-read-recently-played user-library-read playlist-read-private playlist-read-collaborative user-follow-read user-read-playback-state user-read-currently-playing",
     }),
   ],
   session: { jwt: true },

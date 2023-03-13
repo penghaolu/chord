@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import { getProviders, signIn, signOut, useSession } from "next-auth/react";
@@ -21,7 +22,13 @@ export default function Home({ providers }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {session?.user?.accessToken && (
-        <div>Access Token: {session.user.accessToken}</div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          Access Token: {session.user.accessToken}
+          <br />
+          <br />
+          <Link href="/select-playlist">Learn about your music taste</Link>
+          <Link href="/select-friends">Compare with your friends</Link>
+        </div>
       )}
       <main className={styles.main}>
         {Object.values(providers).map((provider) => {
