@@ -7,6 +7,7 @@ import { Button, Cascader } from "antd";
 import axios from "axios";
 import Dropdown from "@/components/Dropdown";
 import Listbox from "@/components/ListBox";
+import Details from "@/components/Details";
 
 const inter = Inter({ subsets: ["latin"] });
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
@@ -36,35 +37,26 @@ export default function Home({ providers }) {
         },
       })
       .then((playlistResponse) => {
-        console.log("playlistResponse", playlistResponse)
-        setPlaylist(playlistResponse.data.items)
+        console.log("playlistResponse", playlistResponse);
+        setPlaylist(playlistResponse.data.items);
       })
       .catch((error) => {
         console.log(error);
       });
   };
-  
-  // const playlistChanged = val => {
-  //   console.log(val);
-  //   setPlaylist({
-  //     selectedPlaylistId: val,
-  //     listOfPlaylistFromAPI: playlist.listOfPlaylistFromAPI
-  //   });
-  // }
 
-  const listboxClicked = val => {
-    console.log("listboxclicked", val)
+  const listboxClicked = (val) => {
+    console.log("listboxclicked", val);
     axios(`https://api.spotify.com/v1/playlists/${val}/tracks`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization' : 'Bearer ' + token
-      }
-    })
-    .then(tracksResponse => {
-      setTracks(tracksResponse.items)
-      console.log("settrack", tracksResponse)
+        Authorization: "Bearer " + token,
+      },
+    }).then((tracksResponse) => {
+      setTracks(tracksResponse.data.items);
+      console.log("settrack", tracksResponse);
     });
-  }
+  };
 
   return (
     <>
@@ -101,9 +93,12 @@ export default function Home({ providers }) {
         >
           Learn about your music taste
         </Button>
-      
-        <Listbox label="Playlist :" items={playlist} clicked={listboxClicked}/>
-        {trackDetail && <p>YAY</p>  }
+
+        <Listbox label="Playlist :" items={playlist} clicked={listboxClicked} />
+        {tracks.map((item, idx) => (
+          <Details option={item.track} key={idx} />
+        ))}
+
         {/* <Button
           type="primary"
           style={{ background: "#1DB954" }}

@@ -1,12 +1,12 @@
 import React from "react";
-import "../styles/globals.css";
+// import "../styles/globals.css";
 
 const Listbox = (props) => {
-  const clicked = e => {
-      e.preventDefault();
-      console.log("e.target.id", e.target.id)
-      props.clicked(e.target.id);
-  }
+  const clicked = (e) => {
+    e.preventDefault();
+    console.log("e.target.id", e.target.id);
+    props.clicked(e.target.id);
+  };
 
   return (
     <div className="col-sm-6 px-0">

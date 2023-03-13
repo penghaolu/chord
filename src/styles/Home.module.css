@@ -6,10 +6,6 @@
   min-height: 100vh;
 }
 
-.listgroup {
-  display: list-item;
-  margin: 2rem;
-}
 .description {
   display: inherit;
   justify-content: inherit;
